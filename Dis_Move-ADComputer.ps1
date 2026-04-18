@@ -1,6 +1,4 @@
 ### This AD Cleanup script for Disabling AD Objects and move to a new disabled OU. Please adjust variable to your liking.  
-### Author: Kayzad Patel
-### Date: 7/8/2021
 ### IMPORTANT Please test $Computer string in a powershell session before utilizing this in the full script to verify the device you are getting are correct. 
 ### Comments:  Please Be careful to $Computers info with correct list object that needs to disabled or you will breaking something really bad! 
 ### You can adjust $InactiveDate variable with actual date in testing such as "06/29/2020".
