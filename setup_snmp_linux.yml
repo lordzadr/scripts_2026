@@ -1,0 +1,33 @@
+- hosts: test
+  become: yes
+  vars:
+    cli:
+      host: "{{ intventory_hostname }}"
+      port: "{{ ansible_ssh_port }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      transport: cli
+  tasks:
+  - name: "install SNMP packages and dependencies"
+    when: ansible_pkg_mgr == "yum"
+    become: true
+    yum:
+      name:
+        - net-snmp
+        - net-snmp-utils
+        - net-snmp-libs
+        - net-snmp-devel
+      state: latest
+      update_cache: yes
+  - name: "Stop SNMPD service to update snmpd.conf file"
+    ansible.builtin.systemd:
+      name: snmpd
+      state: stopped
+      enabled: yes
+  - name: Configure local SNMP local user
+    ansible.builtin.shell: net-snmp-create-v3-user -ro -A 12345 -X 12345 -a MD5 -x DES testuser >> test.log
+  - name: "Start SNMP service again"
+    ansible.builtin.systemd:
+      name: snmpd
+      state: started
+      enabled: yes
