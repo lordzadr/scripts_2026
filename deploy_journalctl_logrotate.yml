@@ -1,0 +1,68 @@
+- name: Configure Logrotate and Journald Log Rotation
+  hosts: all
+  become: yes
+  vars:
+    # Set maximum size of all journal files (e.g., 500M, 1G)
+    journal_max_size: "500M"
+    # Keep logs for a certain amount of time (e.g., 2weeks, 1month)
+    journal_max_time: "7day"
+      #log_path: "/var/log/rsyslog*.log"
+    storage_type: "persistent"
+    rotate_count: "7"
+    size: "+2096K"
+    syslog_service: "rsyslog.service"
+
+  tasks:
+    - name: Ensure journald persistent log directory exists
+      file:
+        path: /var/log/journal
+        state: directory
+        owner: root
+        group: systemd-journal
+        mode: '0755'
+
+    - name: Configure journald for log retention
+      ini_file:
+        path: /etc/systemd/journald.conf
+        section: Journal
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+        state: present
+        backup: true
+      loop:
+        - { option: 'SystemMaxUse', value: "{{ journal_max_size }}" }
+        - { option: 'MaxRetentionSec', value: "{{ journal_max_time }}" }
+        - { option: 'RuntimeMaxUse', value: "{{ journal_max_size }}" }
+        - { option: 'Storage', value: "{{ storage_type }}" }
+
+    - name: Restart journald
+      service:
+        name: systemd-journald
+        state: restarted
+      register: restart_info
+
+    - name: Show journald info
+      ansible.builtin.debug:
+        msg: "restart results is  {{ restart_info.failed }}"
+
+    - name: Ensure logrotate package is installed
+      ansible.builtin.package:
+        name: logrotate
+        state: present
+
+    - name: Add syslog logrotation configuration
+      ansible.builtin.template:
+        src: templates/logrotate_syslog.j2
+        dest: /etc/logrotate.d/rsyslog
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+
+    - name: Validate logrotate config
+      ansible.builtin.command: logrotate -d /etc/logrotate.d/rsyslog
+      register: logrotate_stddout
+
+    - name: Print logrotate stdout
+      ansible.builtin.debug:
+        msg: "Standard Output: {{ logrotate_stddout.stdout }}"
