@@ -1,0 +1,19 @@
+/var/log/cron
+/var/log/maillog
+/var/log/messages
+/var/log/secure
+/var/log/spooler
+/var/log/dnf.log
+/var/log/vmware-*{
+    compress
+    dateext
+    maxage {{ rotate_count }}
+    rotate {{rotate_count }}
+    missingok
+    notifempty
+    size {{ size }}
+    sharedscripts
+    postrotate
+        /usr/bin/systemctl kill -s HUP {{ syslog_service }} >/dev/null 2>&1 || true
+    endscript
+}
