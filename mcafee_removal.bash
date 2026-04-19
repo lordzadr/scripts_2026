@@ -1,5 +1,5 @@
 #!/bin/bash
-#Author: Kayzad Patel - RTT Systems Engineering
+#Author:
 #Version 1.2
 #This script removes Mcafee and Solidcore agent from selected servers
 ## disable sadmin user services #### 
@@ -14,7 +14,7 @@ then
     /usr/local/mcafee/solidcore/tools/cleanup_inventory
 fi
 echo "stopping and deleting more  solidcore services"
-    /etc/init.d/cma unload SOLIDCOR5000_LNX
+    /etc/init.d/cma unload SOLIDCOR5000_L
     sleep 5; 
     chkconfig --del scsrvc	
 ### Removes RPM packages ####
