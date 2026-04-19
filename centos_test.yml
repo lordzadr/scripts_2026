@@ -1,0 +1,15 @@
+- hosts: test
+  tasks:
+  - name: update the system
+    when: ansible_distribution == "CentOS"
+    #become: yes
+    yum:
+      name: "*"
+      state: latest
+      update_cache: yes
+  - name: restart system to reboot to newest kernel
+    reboot:
+      msg: "This server will be rebooted as part of scheduled patching."
+      pre_reboot_delay: 5
+      post_reboot_delay: 10
+      reboot_timeout: 600
