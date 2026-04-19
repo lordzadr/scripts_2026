@@ -43,6 +43,6 @@ ForEach ($Item in $Computers){
 # Move Computer Object to Disabled Computer OU
 ForEach ($Item in $Computers){
   Get-ADComputer -Identity $Item.Name | Set-ADObject -ProtectedFromAccidentalDeletion $false #### ONLY SET this if you to disable ProtectedFromAccidentalDeletion property as it wont be able to be moved to the correct OU with this option checked. Also, didn't test the DistName variable with this script
-  Get-ADComputer -Identity $Item.DistinguishedName | Move-ADObject -TargetPath "OU=Terminated Computers,DC=inc,DC=com"   ### Need verify which if this correct disable OU we will use. Adjust as neseccary 
+  Get-ADComputer -Identity $Item.DistinguishedName | Move-ADObject -TargetPath "OU=Terminated Computers,DC=test,DC=com"   ### Need verify which if this correct disable OU we will use. Adjust as neseccary 
   Write-Output "$($Item.Name) - Move to a disabled OU"
 }
