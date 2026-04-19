@@ -1,7 +1,3 @@
-### This AD Cleanup script for Disabling AD Objects and move to a new disabled OU. Please adjust variable to your liking.  
-### IMPORTANT Please test $Computer string in a powershell session before utilizing this in the full script to verify the device you are getting are correct. 
-### Comments:  Please Be careful to $Computers info with correct list object that needs to disabled or you will breaking something really bad! 
-### You can adjust $InactiveDate variable with actual date in testing such as "06/29/2020".
 
 Import-Module ActiveDirectory
 
@@ -18,7 +14,7 @@ $Computers = Get-ADComputer -Filter { LastLogonDate -lt $InactiveDate -and Enabl
 nDate, DistinguishedName
 
 ### Only use this if you are moving object from a particular OU and adjust Enabled property. 
-#### Get-ADComputer -SearchBase "OU=Workstations,OU=Computers,OU=Server,DC=inc,DC=com" -Filter { LastLogonDate -lt "06/29/2020" -and Enabled -eq $false } -Properties LastLogonDate | Select-Object Name, LastLogonDate, DistinguishedName 
+#### Get-ADComputer -SearchBase "OU=Workstations,OU=Computers,OU=Server,DC=test,DC=com" -Filter { LastLogonDate -lt "06/29/2020" -and Enabled -eq $false } -Properties LastLogonDate | Select-Object Name, LastLogonDate, DistinguishedName 
 
 #-------------------------------
 # REPORTING
