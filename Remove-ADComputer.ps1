@@ -40,7 +40,7 @@ ForEach ($Item in $Computers){
 
 # Move Computer Object to Disabled Computer OU
 ForEach ($Item in $Computers){
-  Get-ADComputer -Identity $Item.DistinguishedName -Confirm:$false | Move-ADObject -TargetPath "OU=Disabled Computers,DC=inc,DC=com"   ### Need verify which if this correct disable we will use. 
+  Get-ADComputer -Identity $Item.DistinguishedName -Confirm:$false | Move-ADObject -TargetPath "OU=Disabled Computers,DC=test,DC=com"   ### Need verify which if this correct disable we will use. 
   Write-Output "$($Item.Name) - Move to a disabled OU"
 }
 
