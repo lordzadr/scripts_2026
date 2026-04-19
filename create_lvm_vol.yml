@@ -1,0 +1,56 @@
+- hosts: test
+- become: yes
+  vars:
+    num1: 1
+  vars_prompt:
+  - name: "rawdisks"
+    prompt: "raw disk used for creating a physical Volume"
+    private: no
+  - name: "lvvol"
+    prompt: " Enter the lv_name"
+    private: no
+  - name: "vgvol"
+    prompt: "Enter the vg name"
+    private: no
+  - name: "mkdir"
+    prompt: "Enter the extact name of the directory you are needing to create"
+    private: no
+  - name: "fstype"
+    prompt: "Specify filesystem type, dont screw it up (ext4 or xfs)"
+    private: no
+  hosts: dlab-vm-0680.test.local
+  tasks:
+  - name: "Scanning for newly added disk"
+    ansible.builtin.shell: "echo 1 > /sys/block/{{ rawdisks }}/device/rescan"
+  - name: "Read disk information"
+    community.general.parted: device=/dev/{{ rawdisks }} unit=s
+    register: rawdisks_info
+  - name: "Create new disk partition"
+    community.general.parted:
+      device: "/dev/{{ rawdisks }}"
+      number: "{{ ( rawdisks_info.partitions | length ) +1 }}"
+      flags: [ lvm ]
+      state: present
+  - name: "Add disk to existing volume group {{ vgvol }}"
+    ansible.builtin.shell: "vgextend {{ vgvol }} /dev/{{ rawdisks }}{{ ( rawdisks_info.partitions | length ) +1 }}"
+  - name: "Creating the logical volume for {{ lvvol }}"
+    community.general.lvol:
+      vg: "{{ vgvol }}"
+      lv: "{{ lvvol }}"
+      size: 100%FREE
+  - name: "Creating new filesystem" 
+    community.general.filesystem:
+     fstype: "{{ fstype }}"
+     dev: "/dev/{{ vgvol }}/{{lvvol }}"
+  - name: "Creating directory of {{ mkdir }}"
+    ansible.builtin.file:
+     path: "/{{ mkdir }}" 
+     state: directory
+     mode: '0755'
+  - name: "Mounting {{ mkdir }}"
+    ansible.posix.mount:
+     path: "/{{ mkdir }}"
+     src: "/dev/mapper/{{ vgvol }}-{{ lvvol }}"
+     fstype: "{{ fstype }}"
+     opts: defaults
+     state: mounted
