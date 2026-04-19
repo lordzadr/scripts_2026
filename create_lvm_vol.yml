@@ -18,7 +18,7 @@
   - name: "fstype"
     prompt: "Specify filesystem type, dont screw it up (ext4 or xfs)"
     private: no
-  hosts: dlab-vm-0680.test.local
+  hosts: test
   tasks:
   - name: "Scanning for newly added disk"
     ansible.builtin.shell: "echo 1 > /sys/block/{{ rawdisks }}/device/rescan"
